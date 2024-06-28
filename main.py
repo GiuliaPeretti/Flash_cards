@@ -39,7 +39,9 @@ def append_card(add_list, add_front, add_back):
         if lists[list]['flashcards'][i][0]==add_front and lists[list]['flashcards'][i][0]==add_back:
             return(add_list, add_front, add_back,"There is already another card with those value")
     
+    # lists[list]['flashcards'].append([add_front, add_back, (0,0)])
     lists[list]['flashcards'].append([add_front, add_back])
+
     set_lists(lists)
     return(add_list,'','','Done!')
 
@@ -85,21 +87,56 @@ def remove(add_list):
     set_lists(lists)
     return('','','','Done!')
 
-def get_card(list):
-    if (add_list==''):
-        return(add_list, add_front, add_back,'Please insert the list where you want to add the flashcard')
+def get_card(list, front, back):
+    print('entra')
+    if (list==''):
+        return(list, front, back,'Please insert the list where you want to add the flashcard')
 
     lists=get_lists()
-    list=None
+    l=None
     for i in range(len(lists)):
-        if lists[i]['name']==add_list:
-            list=i
+        if lists[i]['name']==list:
+            l=i
             break
     if list is None:
         return(add_list, add_front, add_back,"There isn't a list with that name")
-#TODO
+    
+    n=random.randint(0,len(lists[l]['flashcards']))
+    print('arriva')
+    return(add_list, lists[l]['flashcards'][n][0],lists[l]['flashcards'][n][1],'')
 
 
+def check_values(list, front, back):
+    if (list==''):
+        return(list, front, back,'Please insert the list where you want to add the flashcard')
+    if (front=='' or back==''):
+        return(list, front, back,'Please write front and back before checking')
+    lists=get_lists()
+    l=None
+    for i in range(len(lists)):
+        if lists[i]['name']==list:
+            l=i
+            break
+    if l is None:
+        return(add_list, add_front, add_back,"There isn't a list with that name")
+    
+    for  i in range (len(lists[l]['flashcards'])):
+        if lists[l]['flashcards'][i][0]==front and lists[l]['flashcards'][i][1]==back:
+            # lists[l]['flashcards'][i][2][0]+=1
+            # lists[l]['flashcards'][i][2][1]+=1
+            return(add_list, front, back, "Correct!")
+        elif lists[l]['flashcards'][i][0]==front:
+            # lists[l]['flashcards'][i][2][1]+=1
+            back=back+' -> '+lists[l]['flashcards'][i][1]
+            return(add_list, front, back, "Wrong!") 
+
+        elif lists[l]['flashcards'][i][1]==back:
+            # lists[l]['flashcards'][i][2][1]+=1
+            front=front+' -> '+lists[l]['flashcards'][i][0]
+            return(add_list, front, back, "Wrong!")
+
+    return(list,front,back,"There isn't a card with those value")         
+    
 
 
 
@@ -133,8 +170,8 @@ if __name__=='__main__':
         add_card.click(fn=append_card, inputs=[add_list, add_front, add_back], outputs=[add_list, add_front, add_back, add_result])
         delete_card.click(fn=delete, inputs=[add_list, add_front, add_back], outputs=[add_list, add_front, add_back, add_result])
         remove_list.click(fn=remove, inputs=[add_list], outputs=[add_list, add_front, add_back, add_result])
-        random_card.click(fn=get_card, inputs=[list], outputs=[list, front, back])
-
+        random_card.click(fn=get_card, inputs=[list, front, back], outputs=[list, front, back,result])
+        check.click(fn=check_values, inputs=[list, front, back], outputs=[list, front, back,result])
 
 
     demo.launch(share=False)
