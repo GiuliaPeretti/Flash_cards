@@ -87,8 +87,7 @@ def remove(add_list):
     set_lists(lists)
     return('','','','Done!')
 
-def get_card(list, front, back):
-    print('entra')
+def get_card(choose, list, front, back):
     if (list==''):
         return(list, front, back,'Please insert the list where you want to add the flashcard')
 
@@ -101,9 +100,16 @@ def get_card(list, front, back):
     if list is None:
         return(add_list, add_front, add_back,"There isn't a list with that name")
     
-    n=random.randint(0,len(lists[l]['flashcards']))
-    print('arriva')
-    return(add_list, lists[l]['flashcards'][n][0],lists[l]['flashcards'][n][1],'')
+    n=random.randint(0,len(lists[l]['flashcards'])-1)
+    if len(choose)!=1:
+        c=random.choice(['Front','Back'])
+    else:
+        c=choose[0]
+
+    if c=='Front':
+         return(add_list, lists[l]['flashcards'][n][0],'','')
+    else:
+        return(add_list, '',lists[l]['flashcards'][n][1],'')
 
 
 def check_values(list, front, back):
@@ -148,6 +154,7 @@ if __name__=='__main__':
         with gr.Row():
             with gr.Column():
                 gr.Markdown("## Practice")
+                choose=gr.CheckboxGroup(label="If you dont choose one it would be choosen randomly.", choices=['Front','Back'])
                 list=gr.Textbox(label="List: ")
                 front=gr.Textbox(label="Front: ")
                 back=gr.Textbox(label="Back: ")
@@ -164,13 +171,14 @@ if __name__=='__main__':
                 with gr.Row():
                     create_list=gr.Button("Create List")
                     add_card=gr.Button("Add card")
+                with gr.Row():
                     delete_card=gr.Button("Delete card")
                     remove_list=gr.Button("Remove list")
         create_list.click(fn=append_list, inputs=[add_list], outputs=[add_list, add_front, add_back, add_result])   
         add_card.click(fn=append_card, inputs=[add_list, add_front, add_back], outputs=[add_list, add_front, add_back, add_result])
         delete_card.click(fn=delete, inputs=[add_list, add_front, add_back], outputs=[add_list, add_front, add_back, add_result])
         remove_list.click(fn=remove, inputs=[add_list], outputs=[add_list, add_front, add_back, add_result])
-        random_card.click(fn=get_card, inputs=[list, front, back], outputs=[list, front, back,result])
+        random_card.click(fn=get_card, inputs=[choose, list, front, back], outputs=[list, front, back,result])
         check.click(fn=check_values, inputs=[list, front, back], outputs=[list, front, back,result])
 
 
