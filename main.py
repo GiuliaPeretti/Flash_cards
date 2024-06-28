@@ -1,5 +1,6 @@
 import gradio as gr
 import ast
+import random
 
 def get_lists():
     with open('lists.json', 'r') as f:
@@ -18,7 +19,7 @@ def append_list(add_list):
     set_lists(lists)
     return('','','','Done!')
 
-def append_card(add_list, add_front, add_back, add_result):
+def append_card(add_list, add_front, add_back):
     if (add_list==''):
         return(add_list, add_front, add_back,'Please insert the list where you want to add the flashcard')
     if add_front=='':
@@ -33,14 +34,70 @@ def append_card(add_list, add_front, add_back, add_result):
             break
     if list is None:
         return(add_list, add_front, add_back,"There isn't a list with that name")
-    lists[i]['flashcards'].append[add_front, add_back]
+
+    for  i in range (len(lists[list]['flashcards'])):
+        if lists[list]['flashcards'][i][0]==add_front and lists[list]['flashcards'][i][0]==add_back:
+            return(add_list, add_front, add_back,"There is already another card with those value")
+    
+    lists[list]['flashcards'].append([add_front, add_back])
     set_lists(lists)
     return(add_list,'','','Done!')
 
+def delete(add_list, add_front, add_back):
+    if (add_list==''):
+        return(add_list, add_front, add_back,'Please insert the list where you want to delete the flashcard')
+    if add_front=='':
+        return(add_list, add_front, add_back,'Please insert the front of the card')
+    if add_back=='':
+        return(add_list, add_front, add_back,'Please insert the back of the card')
+    lists=get_lists()
+    list=None
+    for i in range(len(lists)):
+        if lists[i]['name']==add_list:
+            list=i
+            break
+    if list is None:
+        return(add_list, add_front, add_back,"There isn't a list with that name")
 
+    for  i in range (len(lists[list]['flashcards'])):
+        if lists[list]['flashcards'][i][0]==add_front and lists[list]['flashcards'][i][1]==add_back:
+            lists[list]['flashcards'].pop(i)
+            set_lists(lists)
+            return(add_list, '', '',"Done")
+    
 
+    return(add_list,add_front, add_back,'There is no card in that list with that value')
 
+def remove(add_list):
+    if (add_list==''):
+        return(add_list, add_front, add_back,'Please insert the list where you want to add the flashcard')
 
+    lists=get_lists()
+    list=None
+    for i in range(len(lists)):
+        if lists[i]['name']==add_list:
+            list=i
+            break
+    if list is None:
+        return(add_list, add_front, add_back,"There isn't a list with that name")
+
+    lists.pop(i)
+    set_lists(lists)
+    return('','','','Done!')
+
+def get_card(list):
+    if (add_list==''):
+        return(add_list, add_front, add_back,'Please insert the list where you want to add the flashcard')
+
+    lists=get_lists()
+    list=None
+    for i in range(len(lists)):
+        if lists[i]['name']==add_list:
+            list=i
+            break
+    if list is None:
+        return(add_list, add_front, add_back,"There isn't a list with that name")
+#TODO
 
 
 
@@ -59,6 +116,7 @@ if __name__=='__main__':
                 back=gr.Textbox(label="Back: ")
                 result=gr.Textbox(label="Result")
                 with gr.Row():
+                    random_card=gr.Button("flashcared")
                     check=gr.Button("Check")
             with gr.Column():
                 gr.Markdown("## Edit lists")
@@ -70,10 +128,12 @@ if __name__=='__main__':
                     create_list=gr.Button("Create List")
                     add_card=gr.Button("Add card")
                     delete_card=gr.Button("Delete card")
-                    remove=gr.Button("Remove list")
+                    remove_list=gr.Button("Remove list")
         create_list.click(fn=append_list, inputs=[add_list], outputs=[add_list, add_front, add_back, add_result])   
-        add_card.click(append_card, inputs=[add_list, add_front, add_back, add_result], outputs=[add_list, add_front, add_back, add_result])
-
+        add_card.click(fn=append_card, inputs=[add_list, add_front, add_back], outputs=[add_list, add_front, add_back, add_result])
+        delete_card.click(fn=delete, inputs=[add_list, add_front, add_back], outputs=[add_list, add_front, add_back, add_result])
+        remove_list.click(fn=remove, inputs=[add_list], outputs=[add_list, add_front, add_back, add_result])
+        random_card.click(fn=get_card, inputs=[list], outputs=[list, front, back])
 
 
 
